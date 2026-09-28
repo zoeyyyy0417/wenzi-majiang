@@ -160,6 +160,47 @@ details.rules li{margin:4px 0}
 .share{background:rgba(0,0,0,.14);border-radius:12px;padding:12px 14px;margin:6px 0 12px}
 .off{font-size:11px;color:var(--gold)}
 .btn.ghost-dark{background:transparent;color:var(--panel-ink);box-shadow:inset 0 0 0 1.5px var(--taupe)}
+.btn.big{flex:1;padding:14px 18px;font-size:17px}
+/* seats */
+.seats2{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 8px;scrollbar-width:none}
+.seat2{flex:none;width:64px;text-align:center}
+.seat2 .av{position:relative;width:52px;height:52px;margin:0 auto;border-radius:50%;background:rgba(0,0,0,.2);
+  display:flex;align-items:center;justify-content:center;font-family:var(--brush);font-size:26px;border:2px solid transparent}
+.seat2.turn .av{background:var(--panel);color:var(--panel-ink);border-color:var(--gold)}
+.seat2 .cnt{position:absolute;right:-6px;bottom:-4px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--gold);color:#2A220C;
+  font-family:var(--ui);font-size:13px;font-weight:700;line-height:22px}
+.seat2 .crown{position:absolute;left:-6px;top:-6px;width:22px;height:22px;border-radius:6px;background:var(--seal);color:var(--seal-ink);font-size:13px;line-height:22px;font-family:var(--brush)}
+.seat2 .nm{font-size:12px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* board */
+.board{background:var(--panel);color:var(--panel-ink);border-radius:16px;padding:12px;margin-top:8px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.board-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.clock{background:var(--panel-ink);color:var(--panel);border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
+.board-head .who{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.champ{font-size:12px;background:rgba(0,0,0,.08);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.board-body{background:rgba(0,0,0,.06);border-radius:12px;padding:14px 10px 18px;min-height:150px}
+.board-body.empty{display:flex;align-items:center;justify-content:center;color:var(--panel-dim);font-size:14px}
+.board .sentence{gap:10px 5px}
+.endnote{font-size:12px;color:var(--seal);margin-top:8px}
+.tile.comma{background:linear-gradient(180deg,#FBF1C6,#F1E1A4);color:#6B5412}
+.tile.staged{box-shadow:0 0 0 2.5px var(--gold),0 calc(var(--tw)*.08) 0 var(--tile-back)}
+.tile.pend{box-shadow:0 0 0 2.5px var(--seal),0 calc(var(--tw)*.08) 0 var(--tile-back);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion: reduce){.tile.pend{animation:none}}
+.nl{flex-basis:100%;height:0}
+.nl-mark{border:0;background:var(--gold);color:#2A220C;border-radius:6px;padding:0 6px;font-size:14px;align-self:center;height:26px}
+.lines{margin-top:14px;background:rgba(0,0,0,.14);border-radius:12px;padding:10px 12px}
+.line{font-family:var(--brush);font-size:20px;line-height:1.5}
+.dock.vote{border-top:2px solid var(--gold)}
+.vote-q{font-weight:600;margin-bottom:10px}
+.vote-btns{display:flex;gap:10px;margin-bottom:12px}
+.comma-btn{background:#F4E6B0;color:#5B4710}
+/* result banner */
+.banner{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));display:flex;justify-content:center;z-index:30;padding:0 12px}
+.banner-card{display:flex;gap:12px;align-items:center;max-width:520px;width:100%;background:var(--panel);color:var(--panel-ink);border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.banner-card .muted{color:var(--panel-dim)}
+.banner .stamp{width:58px;height:58px;line-height:58px;font-size:34px;margin:0;flex:none;border-radius:10px}
+.banner .stamp.fail{font-size:22px;color:var(--panel-dim);box-shadow:inset 0 0 0 2px var(--panel-dim)}
+.banner-seq{font-family:var(--brush);font-size:20px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -178,8 +219,11 @@ details.rules li{margin:4px 0}
 <script>
 const TILE_STR="吃点黑白呆比很爱野火天眼快大的被傻醒喜说钱之好但无影西瓜可生坏梦红王后那里又没少喝要麻烟地吧纯热着对谁去欢乐只在痛东海春哪把中风来气笑心不老失明为饱给有神人你将活到小色鬼都狂哭她们发疯恋日语和别个就迷得啊我多听冷月儿空跑花美过吗它丑乱敌手做夏菜一看像是几子睡死极光如飞电他饿了这酒家想完杀";
 const TILES=[...TILE_STR];
+const COMMA=-1, NL=-2;
+const isMark=x=>x===COMMA||x===NL;
+const HAND=13, TURN_MS=120000, VOTE_MS=60000;
 const DICE="⚀⚁⚂⚃⚄⚅";
-const PREFIX="wzmj-v1-";
+const PREFIX="wzmj-v2-";
 const ICE={iceServers:[
   {urls:"stun:stun.miwifi.com:3478"},
   {urls:"stun:stun.chat.bilibili.com:3478"},
@@ -207,20 +251,22 @@ function merge(a,b){for(const k in b){const v=b[k];
 
 let myUid=lsGet("wzmj:uid");if(!myUid){myUid=rid(10);lsSet("wzmj:uid",myUid)}
 const S={phase:"home",me:myUid,name:lsGet("wzmj:name")||"",code:null,isHost:false,room:null,
-  sel:null,order:[],newTile:null,comp:null,seen:new Set(),banner:null,busy:false,firstSnap:true,netMsg:""};
+  order:[],newTiles:new Set(),staged:[],stageKey:"",seen:new Set(),banner:null,busy:false,firstSnap:true,netMsg:"",deadline:0};
 
 /* ---------- game helpers ---------- */
 const plist=s=>Object.entries(s.players||{}).filter(([,v])=>v).map(([k,v])=>({id:k,...v})).sort((a,b)=>a.at-b.at);
 const nm=(s,u)=>(s.players&&s.players[u]&&s.players[u].name)||"某人";
-const isDone=(s,u,extra)=>!!(s.done&&s.done[u])||u===extra;
-function nextActive(s,u,extra){const seats=s.seats||[];const i=seats.indexOf(u);
-  for(let k=1;k<=seats.length;k++){const x=seats[(i+k)%seats.length];if(!isDone(s,x,extra))return x}return null}
+function nextSeat(s,u){const seats=s.seats||[];const i=seats.indexOf(u);return seats[(i+1)%seats.length]}
 function logP(s,p,...lines){p.log=[...(s.log||[]),...lines].slice(-40);return p}
-function cleanSeq(seq){const out=[];for(const x of seq){if(x<0){if(out.length&&out[out.length-1]>=0)out.push(-1)}else out.push(x)}
-  while(out.length&&out[out.length-1]<0)out.pop();return out}
-const seqText=seq=>seq.map(x=>x<0?"，":TILES[x]).join("");
+const cellText=x=>x===COMMA?"，":x===NL?" / ":TILES[x];
+const seqText=seq=>seq.map(cellText).join("");
+const boardSeq=s=>(s.board||[]).map(c=>c.t);
+/* commas and line breaks never lead, never double up, never trail */
+function cleanAdd(base,add){const out=[];let prev=base.length?base[base.length-1]:null;
+  for(const x of add){if(isMark(x)&&(prev===null||isMark(prev)))continue;out.push(x);prev=x}
+  while(out.length&&isMark(out[out.length-1]))out.pop();return out}
 
-/* ---------- patches: run on the host, with ME = acting player ---------- */
+/* ---------- patches: run on the host, ME = acting player ---------- */
 let ME=null,MENAME="";
 function joinPatch(s){
   const name=String(MENAME||"").trim().slice(0,12);need(name,"先起一个昵称");
@@ -246,50 +292,49 @@ function startPatch(s){
     seats=[...ps].sort((a,b)=>(dice[b][0]+dice[b][1])-(dice[a][0]+dice[a][1]));
     dealer=seats[0];
     seats.forEach(u=>lines.push(`${nm(s,u)} 掷出 ${DICE[dice[u][0]-1]}${DICE[dice[u][1]-1]}，${dice[u][0]+dice[u][1]} 点`));
-    lines.push(`按点数顺时针落座，${nm(s,dealer)} 坐庄`);
+    lines.push(`按点数顺时针落座，${nm(s,dealer)} 先出`);
   }else{
-    seats=[...s.seats];dealer=s.firstWinner||s.dealer;
-    lines.push(`第 ${(s.round||0)+1} 局开始，${nm(s,dealer)} 坐庄`);
+    seats=[...s.seats];dealer=s.winner||s.dealer;
+    lines.push(`第 ${(s.round||0)+1} 局开始，${nm(s,dealer)} 先出`);
   }
   const wall=shuffle([...Array(TILES.length).keys()]);
-  const hands={},discards={},done={};
-  seats.forEach(u=>{hands[u]=[];discards[u]=[];done[u]=null});
+  const hands={};seats.forEach(u=>hands[u]=[]);
   const di=seats.indexOf(dealer);
-  for(let r=0;r<13;r++)for(let k=0;k<seats.length;k++)hands[seats[(di+k)%seats.length]].push(wall.pop());
-  return logP(s,{status:"playing",seats,dice,dealer,round:(s.round||0)+1,wall,hands,discards,done,
-    last:null,turn:dealer,stage:"draw",pending:null,firstWinner:null,lastResult:null,endReason:null},...lines);
+  for(let r=0;r<HAND;r++)for(let k=0;k<seats.length;k++)hands[seats[(di+k)%seats.length]].push(wall.pop());
+  return logP(s,{status:"playing",seats,dice,dealer,round:(s.round||0)+1,wall,hands,board:[],lines:[],
+    turn:dealer,pending:null,champ:null,passes:0,winner:null,lastResult:null,endReason:null,
+    deadline:Date.now()+TURN_MS},...lines);
 }
-const turnOf=(s,u,stage)=>s.status==="playing"&&!s.pending&&s.turn===u&&s.stage===stage;
+const myTurn=(s,u)=>s.status==="playing"&&!s.pending&&s.turn===u;
+function playPatch(s,add,end){
+  need(myTurn(s,ME),"还没轮到你");
+  need(Array.isArray(add),"出牌格式不对");
+  const hand=s.hands[ME]||[];
+  const clean=cleanAdd(boardSeq(s),add.map(Number).filter(x=>isMark(x)||(Number.isInteger(x)&&x>=0&&x<TILES.length)));
+  const tiles=clean.filter(x=>x>=0);
+  need(tiles.length>=1,"至少出一张牌");
+  need(new Set(tiles).size===tiles.length&&tiles.every(t=>hand.includes(t)),"有牌不在你手里");
+  const p={id:rid(6),uid:ME,add:clean,end:!!end,votes:{}};
+  return logP(s,{pending:p,deadline:Date.now()+VOTE_MS},`${nm(s,ME)} 出了「${seqText(clean)}」${end?"，并结束这句":""}`);
+}
+function passTurn(s,u,patch,why){
+  const wall=patch.wall||[...s.wall];let passes=s.passes||0;
+  if(wall.length){const hand=[...((patch.hands&&patch.hands[u])||s.hands[u])];hand.push(wall.pop());
+    patch.wall=wall;patch.hands={[u]:hand};passes=0}
+  else passes+=1;
+  patch.passes=passes;
+  logP(s,patch,`${nm(s,u)} ${why}`);
+  if(!wall.length&&passes>=s.seats.length)return endPatch({...s,log:patch.log},patch,"wall");
+  patch.turn=nextSeat(s,u);patch.deadline=Date.now()+TURN_MS;
+  return patch;
+}
 function drawPatch(s){
-  need(turnOf(s,ME,"draw"),"现在不能摸牌");
-  if(!s.wall.length)return logP(s,{status:"ended",endReason:"wall",pending:null},"牌堆摸完了，本局结束");
-  const wall=[...s.wall];const t=wall.pop();
-  return logP(s,{wall,hands:{[ME]:[...s.hands[ME],t]},stage:"discard",last:null},`${nm(s,ME)} 摸了一张牌`);
+  need(myTurn(s,ME),"还没轮到你");
+  return passTurn(s,ME,{},s.wall.length?"摸了一张，跳过":"牌堆空了，跳过");
 }
-function chiPatch(s){
-  need(turnOf(s,ME,"draw")&&s.last&&s.last.from!==ME,"现在不能吃牌");
-  const {tile,from}=s.last;const pile=[...(s.discards[from]||[])];const i=pile.lastIndexOf(tile);if(i>=0)pile.splice(i,1);
-  return logP(s,{hands:{[ME]:[...s.hands[ME],tile]},discards:{[from]:pile},last:null,stage:"discard"},`${nm(s,ME)} 吃了「${TILES[tile]}」`);
-}
-function discardPatch(s,t){
-  need(turnOf(s,ME,"discard"),"现在不能出牌");
-  const hand=s.hands[ME];need(hand.includes(t),"这张牌不在你手里");
-  const nt=nextActive(s,ME)||ME;
-  return logP(s,{hands:{[ME]:hand.filter(x=>x!==t)},discards:{[ME]:[...(s.discards[ME]||[]),t]},
-    last:{tile:t,from:ME,id:rid(5)},turn:nt,stage:"draw"},`${nm(s,ME)} 打出「${TILES[t]}」`);
-}
-function huPatch(s,comp){
-  need(comp&&Array.isArray(comp.seq),"句子格式不对");
-  need(s.status==="playing"&&!s.pending,"有人正在等投票，稍后再胡");
-  need((s.seats||[]).includes(ME)&&!(s.done&&s.done[ME]),"你这局已经胡过了");
-  let expect;
-  if(comp.source==="self"){need(s.turn===ME&&s.stage==="discard","轮到你出牌时才能自摸胡");expect=[...s.hands[ME]]}
-  else{need(s.stage==="draw"&&s.last&&s.last.from!==ME&&s.last.id===comp.lastId,"这张牌已经不能胡了");expect=[...s.hands[ME],s.last.tile]}
-  const seq=cleanSeq(comp.seq.map(Number));const used=seq.filter(x=>x>=0);
-  need(used.length===expect.length&&new Set(used).size===used.length&&used.every(x=>expect.includes(x)),"要用上全部手牌");
-  const p={id:rid(6),uid:ME,seq,source:comp.source==="self"?"self":"discard",votes:{}};
-  if(p.source==="discard"){p.tile=s.last.tile;p.from=s.last.from}
-  return logP(s,{pending:p},`${nm(s,ME)} 宣告胡牌：「${seqText(seq)}」`);
+function timeoutTurnPatch(s){
+  if(s.status!=="playing"||s.pending)return null;
+  return passTurn(s,s.turn,{},s.wall.length?"超时，自动摸一张":"超时，跳过");
 }
 function votePatch(s,pid,v){
   const p=s.pending;need(p&&p.id===pid,"这轮投票已经结束");
@@ -305,47 +350,50 @@ function forcePatch(s,pid){
   need(s.pending&&s.pending.id===pid,"这轮投票已经结束");
   return resolvePatch(s,s.pending.votes||{});
 }
+function endPatch(s,patch,reason,winner){
+  patch.status="ended";patch.endReason=reason;patch.pending=null;
+  if(winner)patch.winner=winner;
+  return logP(s,patch,reason==="win"?`${nm(s,winner)} 出完了所有手牌，赢下这局`:"牌堆空了又没人能出，本局结束");
+}
 function resolvePatch(s,votes){
   const p=s.pending;const vals=Object.entries(votes).filter(([u])=>u!==p.uid).map(([,v])=>v);
   const y=vals.filter(v=>v==="y").length,n=vals.filter(v=>v==="n").length;const ok=y>n;
-  const patch={pending:null,lastResult:{id:p.id,uid:p.uid,ok,y,n,seq:p.seq,source:p.source}};
   const who=nm(s,p.uid);
-  if(ok){
-    const rank=Object.values(s.done||{}).filter(Boolean).length+1;
-    patch.done={[p.uid]:{rank,seq:p.seq,y,n}};
-    patch.hands={[p.uid]:[]};
-    if(p.source==="discard"){const pile=[...(s.discards[p.from]||[])];const i=pile.lastIndexOf(p.tile);if(i>=0)pile.splice(i,1);patch.discards={[p.from]:pile}}
-    patch.last=null;
-    if(!s.firstWinner)patch.firstWinner=p.uid;
-    const nt=nextActive(s,p.uid,p.uid);
-    if(!nt){patch.status="ended";patch.endReason="all"}else{patch.turn=nt;patch.stage="draw"}
-    return logP(s,patch,`${y} 票合理，${n} 票不合理：${who} 胡牌成功，第 ${rank} 名`);
-  }
-  const hand=[...(s.hands[p.uid]||[])];const wall=[...s.wall];let extra="";
-  if(wall.length){hand.push(wall.pop());patch.hands={[p.uid]:hand};patch.wall=wall;extra="罚摸一张，"}
-  if(p.source==="self"||p.uid===s.turn){patch.turn=nextActive(s,p.uid)||p.uid;patch.stage="draw";patch.last=null}
-  return logP(s,patch,`${y} 票合理，${n} 票不合理：${who} 胡牌失败，${extra}跳过本轮出牌`);
+  const patch={pending:null,lastResult:{id:p.id,uid:p.uid,ok,y,n,add:p.add,end:p.end}};
+  if(!ok){logP(s,patch,`${y} 票合理，${n} 票不合理：${who} 出牌失败，牌退回`);
+    return passTurn({...s,log:patch.log},p.uid,patch,s.wall.length?"罚摸一张，跳过":"跳过");}
+  const used=new Set(p.add.filter(x=>x>=0));
+  const hand=(s.hands[p.uid]||[]).filter(t=>!used.has(t));
+  patch.hands={[p.uid]:hand};patch.champ=p.uid;patch.passes=0;
+  let board=[...(s.board||[]),...p.add.map(t=>({t,u:p.uid}))];
+  let lines=s.lines||[];
+  if(p.end||!hand.length){if(board.length)lines=[...lines,boardSeq({board})].slice(-8);board=[]}
+  patch.board=board;patch.lines=lines;
+  logP(s,patch,`${y} 票合理，${n} 票不合理：${who} 出牌成功${p.end?"，这句完成":""}`);
+  if(!hand.length)return endPatch({...s,log:patch.log},patch,"win",p.uid);
+  patch.turn=nextSeat(s,p.uid);patch.deadline=Date.now()+TURN_MS;
+  return patch;
 }
 const ACTIONS={
   join:s=>joinPatch(s), stand:s=>leavePatch(s), start:s=>startPatch(s),
-  draw:s=>drawPatch(s), chi:s=>chiPatch(s), discard:(s,a)=>discardPatch(s,Number(a.t)),
-  hu:(s,a)=>huPatch(s,a.comp), vote:(s,a)=>votePatch(s,a.pid,a.v), force:(s,a)=>forcePatch(s,a.pid),
+  play:(s,a)=>playPatch(s,a.add,a.end), draw:s=>drawPatch(s),
+  vote:(s,a)=>votePatch(s,a.pid,a.v), force:(s,a)=>forcePatch(s,a.pid),
 };
 
 /* ---------- networking (PeerJS, host is authoritative) ---------- */
 let peer=null,hostConn=null,STATE=null;
-const conns=new Map();      // uid -> conn   (host side)
-const lastSeen=new Map();   // uid -> ms     (host side)
-let lastHostMsg=0,pingTimer=null,retryTimer=null;
+const conns=new Map(),lastSeen=new Map();
+let lastHostMsg=0,pingTimer=null,retryTimer=null,tickTimer=null;
 const shareLink=code=>location.origin+location.pathname+"?room="+code;
 function setUrl(code){try{history.replaceState(null,"",code?location.pathname+"?room="+code:location.pathname)}catch(e){}}
-
 function onlineList(){const now=Date.now();const out=[S.me];for(const [u,t] of lastSeen)if(now-t<13000&&conns.has(u))out.push(u);return out}
 function viewFor(uid){
   const v=clone(STATE);
-  if(v.hands)for(const u in v.hands)if(u!==uid&&Array.isArray(v.hands[u]))v.hands[u]=v.hands[u].map(()=>-1);
+  if(v.hands)for(const u in v.hands)if(u!==uid&&Array.isArray(v.hands[u]))v.hands[u]=v.hands[u].map(()=>-9);
   if(Array.isArray(v.wall))v.wall=v.wall.map(()=>0);
   v.online=onlineList();
+  v.remain=v.deadline?Math.max(0,v.deadline-Date.now()):0;
+  delete v.deadline;
   return v;
 }
 function broadcast(){
@@ -353,19 +401,22 @@ function broadcast(){
   for(const [u,c] of conns){if(c.open){try{c.send({t:"state",s:viewFor(u)})}catch(e){}}}
   onState(viewFor(S.me));
 }
-function hostApply(uid,name,action,args){
-  const fn=ACTIONS[action];if(!fn)return "未知操作";
+function runPatch(uid,name,fn){
   ME=uid;MENAME=name;
-  try{
-    const patch=fn(clone(STATE),args||{});
-    if(patch){patch.updatedAt=Date.now();merge(STATE,patch);broadcast()}
-    return null;
-  }catch(e){return typeof e==="string"?e:"操作失败"}
+  try{const patch=fn(clone(STATE));if(patch){patch.updatedAt=Date.now();merge(STATE,patch);broadcast()}return null}
+  catch(e){if(typeof e!=="string")console.error(e);return typeof e==="string"?e:"操作失败"}
   finally{ME=null;MENAME=""}
 }
-function newPeer(id){
-  return new Peer(id,{config:ICE,debug:0});
+function hostApply(uid,name,action,args){
+  const fn=ACTIONS[action];if(!fn)return "未知操作";
+  return runPatch(uid,name,s=>fn(s,args||{}));
 }
+function hostTick(){
+  if(!STATE||STATE.status!=="playing"||!STATE.deadline||Date.now()<STATE.deadline)return;
+  if(STATE.pending)runPatch(null,"",s=>resolvePatch(s,s.pending.votes||{}));
+  else runPatch(null,"",timeoutTurnPatch);
+}
+const newPeer=id=>new Peer(id,{config:ICE,debug:0});
 function startHost(code,resume){
   S.code=code;S.isHost=true;S.phase="connecting";S.netMsg="正在开桌…";render();
   lsSet("wzmj:host:"+code,"1");setUrl(code);
@@ -373,7 +424,9 @@ function startHost(code,resume){
   if(!STATE||STATE.host!==S.me){
     const now=Date.now();const name=S.name.trim()||"房主";
     STATE={name:name+"的牌桌",host:S.me,createdAt:now,updatedAt:now,status:"lobby",
-      players:{[S.me]:{name,at:now}},seats:[],round:0,log:[`${name} 开了一桌`],pending:null,last:null};
+      players:{[S.me]:{name,at:now}},seats:[],round:0,log:[`${name} 开了一桌`],pending:null};
+  }else if(STATE.status==="playing"){
+    STATE.deadline=Date.now()+(STATE.pending?VOTE_MS:TURN_MS);
   }
   const open=()=>{
     peer=newPeer(PREFIX+code);
@@ -386,17 +439,18 @@ function startHost(code,resume){
     peer.on("disconnected",()=>{if(!peer.destroyed)try{peer.reconnect()}catch(e){}});
     peer.on("error",err=>{
       if(err.type==="unavailable-id"){S.netMsg="房号还被上一次的连接占着，几秒后自动重试…";render();try{peer.destroy()}catch(e){}clearTimeout(retryTimer);retryTimer=setTimeout(open,4000)}
-      else if(err.type==="network"||err.type==="server-error"||err.type==="socket-error"||err.type==="socket-closed"){S.netMsg="连不上联机服务器，正在重试…";render();try{peer.destroy()}catch(e){}clearTimeout(retryTimer);retryTimer=setTimeout(open,4000)}
-      else if(err.type==="browser-incompatible"){S.netMsg="这个浏览器不支持联机，请换 Chrome、Safari 或微信外的浏览器";render()}
+      else if(["network","server-error","socket-error","socket-closed"].includes(err.type)){S.netMsg="连不上联机服务器，正在重试…";render();try{peer.destroy()}catch(e){}clearTimeout(retryTimer);retryTimer=setTimeout(open,4000)}
+      else if(err.type==="browser-incompatible"){S.netMsg="这个浏览器不支持联机，请换 Chrome 或 Safari";render()}
     });
   };
   open();
-  clearInterval(pingTimer);
+  clearInterval(pingTimer);clearInterval(tickTimer);
   let lastOnline="";
   pingTimer=setInterval(()=>{
     for(const c of conns.values())if(c.open)try{c.send({t:"ping"})}catch(e){}
     const on=onlineList().sort().join(",");if(on!==lastOnline){lastOnline=on;if(S.phase==="room")broadcast()}
   },4000);
+  tickTimer=setInterval(hostTick,1000);
 }
 function hostOnData(conn,msg){
   if(!msg||typeof msg!=="object")return;
@@ -411,8 +465,7 @@ function hostOnData(conn,msg){
   if(msg.t==="act"){
     if(msg.name)conn.uname=String(msg.name).slice(0,12);
     const err=hostApply(conn.uid,conn.uname,msg.a,msg.args);
-    if(err)try{conn.send({t:"err",msg:err})}catch(e){}
-    else try{conn.send({t:"ok"})}catch(e){}
+    try{conn.send(err?{t:"err",msg:err}:{t:"ok"})}catch(e){}
   }
 }
 function startClient(code){
@@ -434,8 +487,7 @@ function startClient(code){
     if(hostConn)try{hostConn.close()}catch(e){}
     const c=peer.connect(PREFIX+code,{reliable:true,serialization:"json"});hostConn=c;
     c.on("open",()=>{lastHostMsg=Date.now();c.send({t:"hello",uid:S.me,name:S.name.trim()})});
-    c.on("data",msg=>{lastHostMsg=Date.now();
-      if(!msg)return;
+    c.on("data",msg=>{lastHostMsg=Date.now();if(!msg)return;
       if(msg.t==="state"){S.netMsg="";S.phase="room";onState(msg.s)}
       else if(msg.t==="err"){S.busy=false;toast(msg.msg);render()}
       else if(msg.t==="ok"){S.busy=false;render()}
@@ -461,48 +513,52 @@ function send(a,args){
 function leaveRoom(){
   if(S.isHost&&STATE&&STATE.status!=="closed"&&!confirm("你是房主，离开后其他人会断线。确定离开？"))return;
   if(S.isHost&&STATE){STATE.status="closed";try{broadcast()}catch(e){}lsDel("wzmj:host:"+S.code);lsDel("wzmj:hoststate:"+S.code)}
-  clearInterval(pingTimer);clearTimeout(retryTimer);
+  clearInterval(pingTimer);clearInterval(tickTimer);clearTimeout(retryTimer);
   setTimeout(()=>{try{peer&&peer.destroy()}catch(e){}peer=null},300);
   hostConn=null;conns.clear();lastSeen.clear();STATE=null;
-  S.code=null;S.isHost=false;S.room=null;S.comp=null;S.banner=null;S.phase="home";setUrl(null);render();
+  S.code=null;S.isHost=false;S.room=null;S.staged=[];S.banner=null;S.phase="home";setUrl(null);render();
 }
 
 /* ---------- local view state ---------- */
+let bannerT;
 function onState(v){
   const prev=S.room;S.room=v;
   if(v.status==="closed"&&!S.isHost){toast("房主解散了这一桌");leaveRoom();return}
   if(!prev){try{S.order=JSON.parse(lsGet("wzmj:order:"+S.code)||"[]")}catch(e){S.order=[]}}
-  syncOrder();
+  S.deadline=Date.now()+(v.remain||0);
+  syncOrder(!prev);
+  const key=`${v.round}|${v.turn}|${v.pending?v.pending.id:""}|${(v.board||[]).length}`;
+  if(key!==S.stageKey){S.stageKey=key;S.staged=[]}
+  S.staged=S.staged.filter(x=>isMark(x)||S.order.includes(x));
   const lr=v.lastResult;
-  if(lr&&!S.seen.has(lr.id)){S.seen.add(lr.id);if(!S.firstSnap)S.banner=lr}
-  S.firstSnap=false;
-  if(S.comp&&v.pending)S.comp=null;
-  if(S.comp&&S.comp.source==="discard"&&(!v.last||v.last.id!==S.comp.lastId))S.comp=null;
-  if(S.comp&&S.comp.source==="self"&&!turnOf(v,S.me,"discard"))S.comp=null;
-  S.busy=false;
+  if(lr&&!S.seen.has(lr.id)){S.seen.add(lr.id);if(!S.firstSnap){S.banner=lr;clearTimeout(bannerT);bannerT=setTimeout(()=>{S.banner=null;render()},2600)}}
+  S.firstSnap=false;S.busy=false;
   render();
 }
-function syncOrder(){
-  const h=(S.room&&S.room.hands&&S.room.hands[S.me])||[];
-  const before=new Set(S.order);
+function syncOrder(first){
+  const h=((S.room&&S.room.hands&&S.room.hands[S.me])||[]).filter(t=>t>=0);
   S.order=S.order.filter(t=>h.includes(t));
-  let fresh=null;h.forEach(t=>{if(!S.order.includes(t)){S.order.push(t);fresh=t}});
-  if(fresh!=null&&before.size)S.newTile=fresh;
-  if(!h.includes(S.newTile))S.newTile=null;
-  if(S.sel!=null&&!h.includes(S.sel))S.sel=null;
+  const fresh=[];h.forEach(t=>{if(!S.order.includes(t)){S.order.push(t);fresh.push(t)}});
+  if(fresh.length&&!first&&fresh.length<4)S.newTiles=new Set(fresh);
+  else if(fresh.length)S.newTiles=new Set();
   lsSet("wzmj:order:"+S.code,JSON.stringify(S.order));
 }
+setInterval(()=>{const el=document.getElementById("timer");if(el)el.textContent=Math.max(0,Math.ceil((S.deadline-Date.now())/1000))},500);
 
 /* ---------- rendering ---------- */
-const tileBtn=(t,cls="",act="",v="")=>`<button class="tile ${cls}" ${act?`data-act="${act}" data-v="${v}"`:"tabindex='-1'"} aria-label="${TILES[t]}">${TILES[t]}</button>`;
-const tileSpan=(t,cls="")=>`<span class="tile ${cls}" aria-label="${TILES[t]}">${TILES[t]}</span>`;
-const sentenceHTML=(seq,cls="md")=>`<div class="sentence">${seq.map(x=>x<0?`<span class="brk">，</span>`:tileSpan(x,cls)).join("")}</div>`;
+function cell(x,cls="",act="",v=""){
+  if(x===NL){return act?`<button class="nl-mark" data-act="${act}" data-v="${v}" aria-label="删除换行">↵</button><span class="nl"></span>`:`<span class="nl"></span>`}
+  const isC=x===COMMA;const txt=isC?"，":TILES[x];
+  return act?`<button class="tile ${cls}${isC?" comma":""}" data-act="${act}" data-v="${v}" aria-label="${txt}">${txt}</button>`
+    :`<span class="tile ${cls}${isC?" comma":""}" aria-label="${txt}">${txt}</span>`;
+}
 const RULES=`<details class="rules"><summary>怎么玩</summary><ol>
-<li>2 到 6 人，144 张字牌，每字一张。开局掷骰子，按点数顺时针落座，点数最大的坐庄。</li>
-<li>从庄家开始每人 13 张。轮到你时先摸一张（或者吃掉上家刚打出的牌），再打出一张。</li>
-<li>手里的牌能组成一段喜欢又说得通的文字时就可以胡：轮到你出牌时自摸胡，或者用任何人刚打出的那张胡。可以自由断句，不限文风和主题。</li>
-<li>胡牌时把全部手牌排成句子，由其他玩家投票。觉得合理的多于不合理的就胡牌成功；否则失败，罚摸一张并跳过本轮出牌。</li>
-<li>每局第一个胡牌的人下一局坐庄。所有人都胡了，或者牌堆摸完，本局结束。</li></ol></details>`;
+<li>2 到 6 人，144 张字牌，每人先发 ${HAND} 张。开局掷骰子，点数最大的先出，之后顺时针轮流。</li>
+<li>轮到你时，从手牌里挑牌接在桌上的句子后面，最少一张，最多全部出完。逗号和换行随便加，不占手牌。</li>
+<li>出完牌后其他人投票，觉得合理的多于不合理的就算成功，牌留在桌上；否则牌退回手里，罚摸一张。</li>
+<li>出牌时可以选「出牌并结束这句」，通过后这句收进句子本，桌面清空重新开始。</li>
+<li>不想出或出不了，就摸一张跳过。每轮限时 ${TURN_MS/1000} 秒，超时自动摸牌。</li>
+<li>最先出完手牌的人赢，下一局由赢家先出。</li></ol></details>`;
 
 function render(){
   const a=document.activeElement;const keep=a&&a.id?{id:a.id,s:a.selectionStart,e:a.selectionEnd}:null;
@@ -510,12 +566,12 @@ function render(){
   if(S.phase==="home")h=homeHTML();
   else if(S.phase==="connecting")h=`<div class="wrap">${heroHTML()}<div class="card"><p style="margin:0 0 12px">${esc(S.netMsg||"正在连接…")}</p><button class="btn ghost-dark small" data-act="leave">返回</button></div></div>`;
   else if(S.phase==="room")h=roomHTML();
-  $app.innerHTML=h+overlayHTML();
+  $app.innerHTML=h+bannerHTML();
   if(keep){const el=document.getElementById(keep.id);if(el){el.focus();try{el.setSelectionRange(keep.s,keep.e)}catch(e){}}}
 }
 function heroHTML(){
   return `<header class="hero"><div class="hero-title">${[..."文字麻将"].map(c=>`<span class="tile">${c}</span>`).join("")}</div>
-  <p>摸牌、吃牌、凑句子。胡不胡，桌上的人说了算。</p></header>`;
+  <p>轮流往桌上接字，拼成一句话。说不说得通，桌上的人说了算。</p></header>`;
 }
 function homeHTML(){
   const pendingCode=new URLSearchParams(location.search).get("room");
@@ -554,94 +610,75 @@ function lobbyHTML(s){
   </div>
   <p class="muted" style="margin-top:14px">${host?"人齐了由你开局。你是房主，整局都要开着这个页面，别锁屏太久。":"等房主开局。"}</p>`;
 }
-function statusText(s){
-  const p=s.pending;
-  if(p)return `${esc(nm(s,p.uid))} 宣告胡牌，大家投票中`;
-  const me=s.turn===S.me;const who=esc(nm(s,s.turn));
-  if(s.stage==="draw")return me?"轮到你摸牌":`等 ${who} 摸牌`;
-  return me?"轮到你出牌":`等 ${who} 出牌`;
-}
 function tableHTML(s){
-  const seats=s.seats;const inGame=seats.includes(S.me);const done=s.done||{};const on=new Set(s.online||[]);
-  const seatHTML=seats.map(u=>{const d=done[u];const cnt=(s.hands[u]||[]).length;
-    return `<div class="seat ${u===s.turn&&!d?"turn":""}"><div class="nm">${esc(nm(s,u))}${u===S.me?"（你）":""}</div>
-    <div class="meta muted">${u===s.dealer?`<span class="badge gold" style="margin:0 4px 0 0">庄</span>`:""}${d?`<span class="badge" style="margin:0">已胡 第${d.rank}名</span>`:`${cnt} 张`}${on.has(u)?"":` <span class="off">离线</span>`}</div></div>`}).join("");
-  const piles=seats.map(u=>{const pile=s.discards[u]||[];
-    return `<div class="pile"><div class="who">${esc(nm(s,u))}</div><div class="tiles">${pile.length?pile.map((t,i)=>tileSpan(t,"sm"+(s.last&&s.last.from===u&&i===pile.length-1?" hot":""))).join(""):`<span class="muted" style="font-size:13px;padding-top:4px">还没出牌</span>`}</div></div>`}).join("");
-  const wins=seats.filter(u=>done[u]).sort((a,b)=>done[a].rank-done[b].rank).map(u=>`<div class="win"><div class="head">第 ${done[u].rank} 名 ${esc(nm(s,u))}（${done[u].y} 票合理，${done[u].n} 票不合理）</div>${sentenceHTML(done[u].seq,"md")}</div>`).join("");
-  const log=(s.log||[]).slice(-5).map(l=>`<div>${esc(l)}</div>`).join("");
-  return `<div class="seats">${seatHTML}</div>
-  <div class="status">${statusText(s)}</div>
-  ${s.last&&!s.pending?`<div class="row" style="margin:4px 0 6px"><span class="muted" style="font-size:13px">${esc(nm(s,s.last.from))} 刚打出</span>${tileSpan(s.last.tile,"md hot")}</div>`:""}
-  <div class="pile-list">${piles}</div>
-  ${wins?`<div class="wins">${wins}</div>`:""}
+  const seats=s.seats;const inGame=seats.includes(S.me);const on=new Set(s.online||[]);const p=s.pending;
+  const actor=p?p.uid:s.turn;
+  const seatHTML=seats.map(u=>{const cnt=(s.hands[u]||[]).length;const n=nm(s,u);
+    return `<div class="seat2 ${u===actor?"turn":""}"><div class="av">${esc([...n][0]||"?")}<span class="cnt">${cnt}</span>${u===s.champ?`<span class="crown">擂</span>`:""}</div>
+    <div class="nm">${esc(n)}${u===S.me?"（你）":""}</div>${on.has(u)?"":`<div class="off">离线</div>`}</div>`}).join("");
+  const composing=myTurn(s,S.me);
+  const base=(s.board||[]).map(c=>cell(c.t,"lg"));
+  let extra=[];
+  if(p)extra=p.add.map(x=>cell(x,"lg pend"));
+  else if(composing)extra=S.staged.map((x,i)=>cell(x,"lg staged","unstage",i));
+  const empty=!base.length&&!extra.length;
+  const head=p?`${esc(nm(s,p.uid))} 出牌了，投票中`:composing?"轮到你出牌":`${esc(nm(s,s.turn))} 出牌中`;
+  const lines=(s.lines||[]).slice(-4).map(l=>`<div class="line">${esc(seqText(l))}</div>`).join("");
+  const log=(s.log||[]).slice(-4).map(l=>`<div>${esc(l)}</div>`).join("");
+  return `<div class="seats2">${seatHTML}</div>
+  <section class="board">
+    <div class="board-head"><span class="clock" aria-label="剩余秒数"><span id="timer">${Math.ceil((s.remain||0)/1000)}</span></span><span class="who">${head}</span>
+      ${s.champ?`<span class="champ">擂主 ${esc(nm(s,s.champ))}</span>`:""}</div>
+    <div class="board-body ${empty?"empty":""}">${empty?(composing?"点手牌，把第一个字摆上桌":"桌上还没有字"):`<div class="sentence">${base.join("")}${extra.join("")}</div>`}</div>
+    ${p&&p.end?`<div class="endnote">出牌人想在这里结束这句</div>`:""}
+  </section>
+  ${lines?`<div class="lines"><div class="muted" style="font-size:12px;margin-bottom:4px">句子本</div>${lines}</div>`:""}
   <div class="log">${log}</div>
   ${inGame?dockHTML(s):`<p class="muted" style="margin-top:18px">你在围观这一局。</p>`}`;
 }
 function dockHTML(s){
-  const done=s.done&&s.done[S.me];
-  if(done)return `<div class="dock"><div class="hint">你已经胡了，第 ${done.rank} 名。其他人胡牌时记得投票。</div></div>`;
-  const hand=S.order;const acts=[];const b=S.busy||!!s.pending;let hint="";
-  const canClaim=!s.pending&&s.stage==="draw"&&s.last&&s.last.from!==S.me;
-  if(turnOf(s,S.me,"draw")){
-    hint="摸一张牌，或者吃掉刚打出的那张。";
-    acts.push(`<button class="btn primary" data-act="draw" ${b?"disabled":""}>摸牌</button>`);
-    if(s.last&&s.last.from!==S.me)acts.push(`<button class="btn" data-act="chi" ${b?"disabled":""}>吃「${TILES[s.last.tile]}」</button>`);
-  }else if(turnOf(s,S.me,"discard")){
-    hint=S.sel==null?"点一张牌选中，再打出；能凑成句子就胡。":"选中了「"+TILES[S.sel]+"」，可以打出或左右挪动整理。";
-    acts.push(`<button class="btn primary" data-act="discard" ${b||S.sel==null?"disabled":""}>打出${S.sel!=null?"「"+TILES[S.sel]+"」":""}</button>`);
-    acts.push(`<button class="btn seal" data-act="huSelf" ${b?"disabled":""}>胡牌</button>`);
-  }else hint=s.pending?"投票结束后继续。":"没轮到你。点牌可以选中，再左右挪动整理手牌。";
-  if(canClaim)acts.push(`<button class="btn seal" data-act="huDiscard" ${b?"disabled":""}>用「${TILES[s.last.tile]}」胡</button>`);
-  if(S.sel!=null)acts.push(`<button class="btn ghost small" data-act="moveL">‹ 左移</button><button class="btn ghost small" data-act="moveR">右移 ›</button>`);
-  return `<div class="dock"><div class="hint">${hint}</div>${acts.length?`<div class="actions">${acts.join("")}</div>`:""}
-    <div class="tiles hand">${hand.map(t=>tileBtn(t,"hand"+(S.sel===t?" sel":"")+(S.newTile===t?" new":""),"sel",t)).join("")}</div></div>`;
+  const p=s.pending;
+  if(p){
+    const voters=s.seats.filter(u=>u!==p.uid);const votes=p.votes||{};const cast=voters.filter(u=>votes[u]).length;const mine=votes[S.me];
+    let body;
+    if(p.uid===S.me)body=`<div class="vote-q">等大家投票（${cast}/${voters.length}）</div>`;
+    else if(!mine)body=`<div class="vote-q">「${esc(seqText(p.add))}」接得通吗？</div><div class="vote-btns"><button class="btn primary big" data-act="vote" data-v="y" ${S.busy?"disabled":""}>合理</button><button class="btn big" data-act="vote" data-v="n" ${S.busy?"disabled":""}>不合理</button></div>`;
+    else body=`<div class="vote-q">你投了「${mine==="y"?"合理":"不合理"}」，已投 ${cast}/${voters.length}</div>`;
+    const force=s.host===S.me&&cast<voters.length?`<button class="btn ghost small" data-act="force" style="margin-top:10px">有人掉线？按已投的票结算</button>`:"";
+    return `<div class="dock vote">${body}${force}${handHTML(false)}</div>`;
+  }
+  const mine=myTurn(s,S.me);const b=S.busy;const n=S.staged.filter(x=>x>=0).length;
+  const lastMark=(()=>{const q=S.staged;const last=q.length?q[q.length-1]:((s.board||[]).slice(-1)[0]||{}).t;return last===undefined||isMark(last)})();
+  const acts=mine?`<div class="actions">
+    <button class="btn primary" data-act="play" ${b||!n?"disabled":""}>出牌${n?` ${n} 张`:""}</button>
+    <button class="btn" data-act="playEnd" ${b||!n?"disabled":""}>出牌并结束这句</button>
+    <button class="btn small comma-btn" data-act="mark" data-v="${COMMA}" ${lastMark?"disabled":""}>加逗号</button>
+    <button class="btn small" data-act="mark" data-v="${NL}" ${lastMark?"disabled":""}>换行</button>
+    <button class="btn small" data-act="undo" ${S.staged.length?"":"disabled"}>撤回</button>
+    <button class="btn ghost small" data-act="draw" ${b?"disabled":""}>摸一张跳过</button></div>`:"";
+  const hint=mine?"点手牌接到句子后面，点桌上高亮的牌放回来。":"没轮到你，可以先想想接什么。";
+  return `<div class="dock"><div class="hint">${hint}</div>${acts}${handHTML(mine)}</div>`;
+}
+function handHTML(active){
+  const used=new Set(S.staged.filter(x=>x>=0));
+  const tiles=S.order.filter(t=>!used.has(t));
+  return `<div class="tiles hand">${tiles.map(t=>active?cell(t,"hand"+(S.newTiles.has(t)?" new":""),"stage",t):cell(t,"hand"+(S.newTiles.has(t)?" new":""))).join("")||`<span class="muted">手牌出完了</span>`}</div>`;
 }
 function endedHTML(s){
-  const done=s.done||{};const seats=s.seats||[];
-  const winners=seats.filter(u=>done[u]).sort((a,b)=>done[a].rank-done[b].rank);
-  const rest=seats.filter(u=>!done[u]);const host=s.host===S.me;
-  return `<div class="status">${s.endReason==="wall"?"牌堆摸完，本局结束":"所有人都胡了"}</div>
-  <div class="rank">${winners.map(u=>`<div class="win"><div class="head">第 ${done[u].rank} 名 ${esc(nm(s,u))}</div>${sentenceHTML(done[u].seq,"md")}</div>`).join("")}
-  ${rest.length?`<div class="win"><div class="head">没胡：${esc(rest.map(u=>nm(s,u)).join("、"))}</div></div>`:""}</div>
-  <div class="row" style="margin-top:18px">${host?`<button class="btn primary" data-act="start" ${S.busy?"disabled":""}>再来一局</button>`:`<span class="muted">等房主开下一局。</span>`}</div>
-  ${s.firstWinner?`<p class="muted">下一局由 ${esc(nm(s,s.firstWinner))} 坐庄。</p>`:""}`;
+  const seats=s.seats||[];const host=s.host===S.me;
+  const ranked=[...seats].sort((a,b)=>(a===s.winner?-1:b===s.winner?1:(s.hands[a]||[]).length-(s.hands[b]||[]).length));
+  return `<div class="status">${s.endReason==="win"?`${esc(nm(s,s.winner))} 赢了`:"牌堆空了，本局结束"}</div>
+  <div class="rank">${ranked.map((u,i)=>`<div class="room-item"><div class="grow"><b>第 ${i+1} 名 ${esc(nm(s,u))}</b><span class="muted">剩 ${(s.hands[u]||[]).length} 张</span></div></div>`).join("")}</div>
+  ${(s.lines||[]).length?`<div class="lines" style="margin-top:16px"><div class="muted" style="font-size:12px;margin-bottom:4px">这局拼出的句子</div>${s.lines.map(l=>`<div class="line">${esc(seqText(l))}</div>`).join("")}</div>`:""}
+  <div class="row" style="margin-top:18px">${host?`<button class="btn primary" data-act="start" ${S.busy?"disabled":""}>再来一局</button>`:`<span class="muted">等房主开下一局。</span>`}</div>`;
 }
-function overlayHTML(){
-  const s=S.room;if(S.phase!=="room"||!s)return "";
-  if(S.banner){const r=S.banner;const who=esc(nm(s,r.uid));
-    return `<div class="overlay" role="dialog" aria-modal="true"><div class="sheet center">
-    ${r.ok?`<div class="stamp">胡</div><h2>${who} 胡了</h2>`:`<div class="stamp fail">不通过</div><h2>${who} 没胡成</h2>`}
-    <p class="muted" style="margin:0 0 12px">${r.y} 票合理，${r.n} 票不合理${r.ok?"":"。罚摸一张，跳过本轮出牌"}</p>
-    <div style="display:flex;justify-content:center">${sentenceHTML(r.seq,"lg")}</div>
-    <div style="margin-top:18px"><button class="btn primary" data-act="bannerClose">继续</button></div></div></div>`}
-  if(S.comp)return composerHTML();
-  if(s.status==="playing"&&s.pending)return voteHTML(s);
-  return "";
-}
-function composerHTML(){
-  const c=S.comp;const used=new Set(c.seq.filter(x=>x>=0));const rest=c.tiles.filter(t=>!used.has(t));
-  return `<div class="overlay" role="dialog" aria-modal="true" aria-label="排句子"><div class="sheet">
-  <h2>排句子</h2><p class="muted" style="margin:0">按顺序点牌组句，用上全部 ${c.tiles.length} 张。「断句」加一个停顿，点句子里的牌放回去。</p>
-  <div class="compose-area ${c.seq.length?"":"empty"}">${c.seq.length?`<div class="sentence">${c.seq.map((x,i)=>x<0?`<button class="brk" style="background:none;border:0;padding:0" data-act="compDel" data-v="${i}" aria-label="删除断句">，</button>`:tileBtn(x,"lg","compDel",i)).join("")}</div>`:"点下面的牌开始排"}</div>
-  <div class="row" style="margin-bottom:12px"><button class="btn small" data-act="compBreak" ${c.seq.length?"":"disabled"}>断句</button>
-  <button class="btn small" data-act="compUndo" ${c.seq.length?"":"disabled"}>撤回</button><button class="btn small" data-act="compClear" ${c.seq.length?"":"disabled"}>清空</button></div>
-  <div class="tiles">${rest.map(t=>tileBtn(t,"hand"+(c.source==="discard"&&t===c.claimed?" hot":""),"compAdd",t)).join("")}</div>
-  <div class="row" style="margin-top:18px"><button class="btn seal" data-act="compSubmit" ${rest.length||S.busy?"disabled":""}>请大家投票</button>
-  <button class="btn ghost" data-act="compCancel">取消</button></div></div></div>`;
-}
-function voteHTML(s){
-  const p=s.pending;const voters=s.seats.filter(u=>u!==p.uid);const votes=p.votes||{};
-  const cast=voters.filter(u=>votes[u]).length;const mine=votes[S.me];
-  const iVote=voters.includes(S.me);const who=esc(nm(s,p.uid));
-  let body;
-  if(p.uid===S.me)body=`<p class="muted">等大家投票（${cast}/${voters.length}）</p>`;
-  else if(iVote&&!mine)body=`<p class="muted" style="margin:0 0 12px">这句话说得通吗？</p><div class="row"><button class="btn primary" data-act="vote" data-v="y" ${S.busy?"disabled":""}>合理</button><button class="btn" data-act="vote" data-v="n" ${S.busy?"disabled":""}>不合理</button></div>`;
-  else body=`<p class="muted">${mine?`你投了「${mine==="y"?"合理":"不合理"}」，`:""}已投 ${cast}/${voters.length}</p>`;
-  const force=s.host===S.me&&cast<voters.length?`<button class="btn ghost small" data-act="force" style="margin-top:12px">有人掉线？按已投的票结算</button>`:"";
-  return `<div class="overlay" role="dialog" aria-modal="true"><div class="sheet">
-  <h2>${who} 要胡</h2><p class="muted" style="margin:0">${p.source==="discard"?`用 ${esc(nm(s,p.from))} 打出的「${TILES[p.tile]}」`:"自摸"}，排出了这句：</p>
-  <div class="compose-area">${sentenceHTML(p.seq,"lg")}</div>${body}${force}</div></div>`;
+function bannerHTML(){
+  const s=S.room;if(S.phase!=="room"||!s||!S.banner)return "";
+  const r=S.banner;const who=esc(nm(s,r.uid));
+  return `<div class="banner" data-act="bannerClose" role="status"><div class="banner-card">
+    <div class="stamp ${r.ok?"":"fail"}">${r.ok?"过":"不过"}</div>
+    <div><b>${who}${r.ok?" 出牌成功":" 出牌失败"}</b><div class="muted" style="font-size:13px">${r.y} 票合理，${r.n} 票不合理${r.ok?"":"，牌退回并罚摸一张"}</div>
+    <div class="banner-seq">${esc(seqText(r.add))}</div></div></div></div>`;
 }
 
 /* ---------- events ---------- */
@@ -653,7 +690,7 @@ async function share(){
   const el=document.getElementById("linkInput");if(el){el.focus();el.select()}toast("长按链接手动复制");
 }
 const ACT={
-  create:()=>{if(!S.name.trim())return toast("先起一个昵称");startHost(rid(5,"abcdefghjkmnpqrstuvwxyz23456789"),false)},
+  create:()=>{if(!S.name.trim())return toast("先起一个昵称");startHost(rid(5),false)},
   joinCode:v=>{if(!S.name.trim())return toast("先起一个昵称");const c=normCode(v);if(lsGet("wzmj:host:"+c))startHost(c,true);else startClient(c)},
   joinInput:()=>{const c=normCode((document.getElementById("codeInput")||{}).value);if(!c)return toast("输入房号");ACT.joinCode(c)},
   leave:()=>leaveRoom(),
@@ -661,26 +698,18 @@ const ACT={
   sit:()=>{if(!S.name.trim())return toast("先起一个昵称");send("join")},
   stand:()=>send("stand"),
   start:()=>send("start"),
-  draw:()=>send("draw"),
-  chi:()=>send("chi"),
-  sel:v=>{const t=+v;S.sel=S.sel===t?null:t;render()},
-  discard:()=>{if(S.sel!=null)send("discard",{t:S.sel})},
-  moveL:()=>moveSel(-1),moveR:()=>moveSel(1),
-  huSelf:()=>{S.comp={source:"self",tiles:[...S.order],seq:[]};render()},
-  huDiscard:()=>{const s=S.room;if(!s.last)return;S.comp={source:"discard",tiles:[...S.order,s.last.tile],claimed:s.last.tile,lastId:s.last.id,seq:[]};render()},
-  compAdd:v=>{S.comp.seq.push(+v);render()},
-  compDel:v=>{S.comp.seq.splice(+v,1);render()},
-  compBreak:()=>{const q=S.comp.seq;if(q.length&&q[q.length-1]>=0)q.push(-1);render()},
-  compUndo:()=>{S.comp.seq.pop();render()},
-  compClear:()=>{S.comp.seq=[];render()},
-  compCancel:()=>{S.comp=null;render()},
-  compSubmit:()=>{const c=S.comp;send("hu",{comp:{source:c.source,seq:c.seq,lastId:c.lastId}})},
+  stage:v=>{S.staged.push(+v);S.newTiles.delete(+v);render()},
+  unstage:v=>{S.staged.splice(+v,1);render()},
+  mark:v=>{const q=S.staged;const last=q.length?q[q.length-1]:((S.room.board||[]).slice(-1)[0]||{}).t;
+    if(last===undefined||isMark(last))return;q.push(+v);render()},
+  undo:()=>{S.staged.pop();render()},
+  play:()=>send("play",{add:S.staged,end:false}),
+  playEnd:()=>send("play",{add:S.staged,end:true}),
+  draw:()=>{S.staged=[];send("draw")},
   vote:v=>{const p=S.room.pending;if(p)send("vote",{pid:p.id,v})},
   force:()=>{const p=S.room.pending;if(p)send("force",{pid:p.id})},
   bannerClose:()=>{S.banner=null;render()},
 };
-function moveSel(d){const i=S.order.indexOf(S.sel);const j=i+d;if(i<0||j<0||j>=S.order.length)return;
-  [S.order[i],S.order[j]]=[S.order[j],S.order[i]];lsSet("wzmj:order:"+S.code,JSON.stringify(S.order));render()}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f)f(b.dataset.v,b)});
 document.addEventListener("input",e=>{if(e.target.id==="nameInput"){S.name=e.target.value;lsSet("wzmj:name",S.name)}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="codeInput")ACT.joinInput()});
